@@ -1116,7 +1116,7 @@ BOOL SendBark(wchar_t* szBarkUrl,wchar_t* szBarkSound,wchar_t* szTitle, wchar_t*
     WCHAR wOutBuffer[2048];
 	WCHAR szBody[2048];
 	wsprintf(szBody, L"{\n\"body\": \"%s\",\n	\"title\": \"%s\",\n \"badge\": 1,\n \"category\": \"category\",\n \"sound\": \"%s\",\n \"icon\": \"https://%s\",\n \"url\": \"%s\"\n }", szContent, szTitle, szBarkSound, szImg, szUrl);
-    HttpRequest(wDomain, wGet, NULL, NULL, wOutBuffer, 2048, TRUE, szBody, FALSE, uPort, L"application/json");
+    HttpRequest(wDomain, wGet, NULL, NULL, wOutBuffer, 2046, TRUE, szBody, FALSE, uPort, L"application/json");
     return TRUE;
 }
 
@@ -1128,7 +1128,7 @@ BOOL GetWeChatToken(wchar_t* corpid, wchar_t *corpsecret,wchar_t * access_token)
     lstrcat(szGet, L"&corpsecret=");
     lstrcat(szGet, corpsecret);
     WCHAR szOutBuffer[2048] = { 0 };
-    HttpRequest(L"qyapi.weixin.qq.com", szGet, NULL, NULL, szOutBuffer, 2048);
+    HttpRequest(L"qyapi.weixin.qq.com", szGet, NULL, NULL, szOutBuffer, 2046);
     WCHAR *cToken = lstrstr(szOutBuffer, L"access_token");
     if (cToken)
     {
@@ -1155,7 +1155,7 @@ BOOL SendWeChatPusher(wchar_t* uid, wchar_t* szTitle, wchar_t* szContent, wchar_
     wsprintf(szBody, L"{\n\"touser\": \"%s\",\n\"msgtype\": \"news\",\n	\"agentid\": %s,\n	\"news\" : {\n	\"articles\": [{\n	\"title\": \"%s\",\n \"description\": \"%s\",\n \"url\": \"%s\",\n \"picurl\": \"https://%s\"\n }]\n},\n}",
         RemindSave.szWeChatUserID, RemindSave.szWeChatAgentId, szTitle, szContent, szUrl, szImg);
     WCHAR wOutBuffer[2048];
-    HttpRequest(L"qyapi.weixin.qq.com", szGet, NULL, NULL, wOutBuffer, 2048, TRUE, szBody, FALSE, INTERNET_DEFAULT_HTTPS_PORT, L"application/json");
+    HttpRequest(L"qyapi.weixin.qq.com", szGet, NULL, NULL, wOutBuffer, 2046, TRUE, szBody, FALSE, INTERNET_DEFAULT_HTTPS_PORT, L"application/json");
     if (lstrstr(wOutBuffer, L"access_token"))
     {
         if (lpRemindData->szWeChatToken[0] != L'~')
@@ -1175,7 +1175,7 @@ BOOL SendDingDing(wchar_t* access_token, wchar_t* szTitle, wchar_t* szContent, w
 	WCHAR szBody[2048];
     wsprintf(szBody,L"{\n \"msgtype\": \"link\",\n \"link\": {\n \"text\": \"%s\",\n \"title\": \"%s\",\n \"picUrl\": \"https://%s\",\n \"messageUrl\": \"%s\"\n }\n}", szContent, szTitle, szImg, szUrl);
     WCHAR wOutBuffer[2048];
-    HttpRequest(L"oapi.dingtalk.com", szGet, NULL, NULL, wOutBuffer, 2048, TRUE, szBody, FALSE, INTERNET_DEFAULT_HTTPS_PORT, L"application/json");
+    HttpRequest(L"oapi.dingtalk.com", szGet, NULL, NULL, wOutBuffer, 2046, TRUE, szBody, FALSE, INTERNET_DEFAULT_HTTPS_PORT, L"application/json");
 	return TRUE;
 }
 
@@ -1186,7 +1186,7 @@ BOOL SendWxPusher(wchar_t* uid, wchar_t* szTitle, wchar_t* szContent, wchar_t* s
     wsprintf(szBody, L"\n{\n\"appToken\":\"%s\",\n\"content\":\"<img src=https://%s /> <font size=4> <br /> %s </font> \",\n\"summary\":\"%s\",\n\"contentType\":2,\n\"topicIds\":[123],\n\"uids\":[\"%s\"],\n\"url\":\"%s\"\n}\n",
         szWxPusherToken, szImg, szContent, szTitle, uid, szUrl);
     WCHAR wOutBuffer[2048];
-    HttpRequest(L"wxpusher.zjiecode.com", szGet, NULL, NULL, wOutBuffer, 2048, TRUE, szBody, FALSE, INTERNET_DEFAULT_HTTPS_PORT, L"application/json");
+    HttpRequest(L"wxpusher.zjiecode.com", szGet, NULL, NULL, wOutBuffer, 2046, TRUE, szBody, FALSE, INTERNET_DEFAULT_HTTPS_PORT, L"application/json");
     return TRUE;
 }
 void GetMember(WCHAR*szMember,WCHAR*szMemberID)
@@ -1197,7 +1197,7 @@ void GetMember(WCHAR*szMember,WCHAR*szMemberID)
 	lstrcat(szGet, szUrlCode);
 	WCHAR *wOutBuffer= new WCHAR[NETPAGESIZE];
     WCHAR wCookie[CookieSize] = L"ssmx_ab=mxss38";
-	HttpRequest(L"search.smzdm.com", szGet, NULL, wCookie, wOutBuffer, NETPAGESIZE, FALSE);
+	HttpRequest(L"search.smzdm.com", szGet, NULL, wCookie, wOutBuffer, NETPAGESIZE-2, FALSE);
 	WCHAR* wMember = lstrstr(wOutBuffer, L"member/");
 	if (wMember)
 	{
@@ -1241,7 +1241,7 @@ BOOL GetMemberZhiStarTalk(WCHAR* wUrl, UINT* uZhi, UINT* uBuZhi, UINT* uStar, UI
     WCHAR szHost[128];
     lstrcpyn(szHost, wHost, int(wUrlPath - wHost + 1));
     WCHAR* wOutBuffer = new WCHAR[NETPAGESIZE];
-    HttpRequest(szHost, wUrlPath, NULL, NULL, wOutBuffer, NETPAGESIZE, FALSE);
+    HttpRequest(szHost, wUrlPath, NULL, NULL, wOutBuffer, NETPAGESIZE-2, FALSE);
     WCHAR* wStart = wOutBuffer;// xstrstr(pszOutBuffer, "icon-thumb-up-o-thin");
     if (wStart)
     {
@@ -1328,7 +1328,7 @@ DWORD WINAPI GetZhiThreadProc(PVOID pParam)//获取网站数据线程
 int SignKaFan(WCHAR* wCookie)
 {
     WCHAR* wOutBuffer = new WCHAR[1024 * 1024];
-    HttpRequest(L"bbs.kafan.cn", L"/", L"https://bbs.kafan.cn/", wCookie, wOutBuffer, 1024 * 1024, FALSE);
+    HttpRequest(L"bbs.kafan.cn", L"/", L"https://bbs.kafan.cn/", wCookie, wOutBuffer, 1024 * 1024-2, FALSE);
     if (lstrstr(wOutBuffer, L"找回密码"))
     {
         WriteLog(L"Cookie失效    卡饭论坛", TRUE);
@@ -1349,7 +1349,7 @@ int SignKaFan(WCHAR* wCookie)
                     wLinkEnd[0] = L'\0';
                     WCHAR szLink[128] = L"/plugin.php?id=dsu_amupper&ppersubmit=true&";
                     lstrcat(szLink, wLink);
-                    HttpRequest(L"bbs.kafan.cn", szLink, L"https://bbs.kafan.cn/", wCookie, wOutBuffer, 1024 * 1024, FALSE);
+                    HttpRequest(L"bbs.kafan.cn", szLink, L"https://bbs.kafan.cn/", wCookie, wOutBuffer, 1024 * 1024-2, FALSE);
                 }
             }
         }
@@ -1381,7 +1381,7 @@ int Sign52pojie(WCHAR* wCookie)
 int SignSeHuaTang(WCHAR* wCookie)
 {
     WCHAR* wOutBuffer = new WCHAR[1024 * 1024];
-    HttpRequest(L"www.sehuatang.org", L"/plugin.php?id=dd_sign&mod=sign", L"https://www.sehuatang.org/", wCookie, wOutBuffer, 1024 * 1024, FALSE);
+    HttpRequest(L"www.sehuatang.org", L"/plugin.php?id=dd_sign&mod=sign", L"https://www.sehuatang.org/", wCookie, wOutBuffer, 1024 * 1024-2, FALSE);
     if (lstrstr(wOutBuffer, L"尚未登录"))
     {
         WriteLog(L"Cookie失效    98堂", TRUE);
@@ -1429,7 +1429,7 @@ int SignSeHuaTang(WCHAR* wCookie)
 //                                            WCHAR szHome[1024];
                                             //                                            wsprintf(szHome, L"/home.php?mod=spacecp&ac=pm&op=checknewpm&rand=%s");
                                             //                                                                                        HttpRequest(L"www.sehuatang.org", L"", szHome, wCookie, wNumBuffer, 1024 * 1024, FALSE);
-                                            HttpRequest(L"www.sehuatang.org", L"/misc.php?mod=secqaa&action=update&idhash=qS0&0.8888888888888888", L"https://www.sehuatang.org/plugin.php?id=dd_sign&mod=sign", wCookie, wNumBuffer, 1024 * 1024, FALSE);
+                                            HttpRequest(L"www.sehuatang.org", L"/misc.php?mod=secqaa&action=update&idhash=qS0&0.8888888888888888", L"https://www.sehuatang.org/plugin.php?id=dd_sign&mod=sign", wCookie, wNumBuffer, 1024 * 1024-2, FALSE);
                                             WCHAR* wNum = lstrstr(wNumBuffer, L" = ?");
                                             if (wNum)
                                             {
@@ -1457,7 +1457,7 @@ int SignSeHuaTang(WCHAR* wCookie)
                                                     lstrcat(szLink, wLink);
                                                     lstrcat(szLink, L"&inajax=1");
                                                     wsprintf(szPost, L"formhash=%s&signtoken=%s&secqaahash=qS0&secanswer=%d", wFormhash, wSigntoken, iSecanswer);
-                                                    HttpRequest(L"www.sehuatang.org", szLink, L"https://www.sehuatang.org/plugin.php?id=dd_sign&mod=sign", wCookie, wOutBuffer, 1024 * 1024, TRUE, szPost);
+                                                    HttpRequest(L"www.sehuatang.org", szLink, L"https://www.sehuatang.org/plugin.php?id=dd_sign&mod=sign", wCookie, wOutBuffer, 1024 * 1024-2, TRUE, szPost);
                                                 }
                                             }
                                         }
@@ -1478,7 +1478,7 @@ int SignSeHuaTang(WCHAR* wCookie)
 int SignPCBeta(WCHAR* wCookie)
 {
     WCHAR* wOutBuffer = new WCHAR[1024 * 1024];
-    HttpRequest(L"i.pcbeta.com", L"/home.php?mod=task&do=apply&id=149", L"https://i.pcbeta.com/", wCookie, wOutBuffer, 1024 * 1024, FALSE);
+    HttpRequest(L"i.pcbeta.com", L"/home.php?mod=task&do=apply&id=149", L"https://i.pcbeta.com/", wCookie, wOutBuffer, 1024 * 1024-2, FALSE);
     if (lstrstr(wOutBuffer, L"要先登录"))
     {
         WriteLog(L"Cookie失效    远景论坛", TRUE);
@@ -1489,7 +1489,7 @@ int SignPCBeta(WCHAR* wCookie)
     {
         WriteLog(L"签到    远景论坛", FALSE);
     }
-    HttpRequest(L"i.pcbeta.com", L"/home.php?mod=task&item=new", L"https://i.pcbeta.com/", wCookie, wOutBuffer, 1024 * 1024, FALSE);
+    HttpRequest(L"i.pcbeta.com", L"/home.php?mod=task&item=new", L"https://i.pcbeta.com/", wCookie, wOutBuffer, 1024 * 1024-2, FALSE);
     WCHAR* wApply = lstrstr(wOutBuffer, L"do=apply");
     if (wApply)
     {
@@ -1505,10 +1505,10 @@ int SignPCBeta(WCHAR* wCookie)
                 lstrcpy(wID, wLink);
                 WCHAR wNew[256] = L"/home.php?mod=task&do=apply&id=";
                 lstrcat(wNew, wID);
-                HttpRequest(L"i.pcbeta.com", wNew, L"https://i.pcbeta.com/", wCookie, wOutBuffer, 1024 * 1024, FALSE);
+                HttpRequest(L"i.pcbeta.com", wNew, L"https://i.pcbeta.com/", wCookie, wOutBuffer, 1024 * 1024-2, FALSE);
                 WCHAR wNow[256] = L"/home.php?mod=task&do=view&id=";
                 lstrcat(wNow, wID);
-                HttpRequest(L"i.pcbeta.com", wNow, L"https://i.pcbeta.com/", wCookie, wOutBuffer, 1024 * 1024, FALSE);
+                HttpRequest(L"i.pcbeta.com", wNow, L"https://i.pcbeta.com/", wCookie, wOutBuffer, 1024 * 1024-2, FALSE);
                 WCHAR* wIS = lstrstr(wOutBuffer, L"在“");
                 if (wIS)
                 {
@@ -1521,7 +1521,7 @@ int SignPCBeta(WCHAR* wCookie)
                             wOutEnd[0] = L'\0';
                             WCHAR wReferer[1024] = L"https://bbs.pcbeta.com";
                             lstrcat(wReferer, wOut);
-                            HttpRequest(L"bbs.pcbeta.com", wOut, L"https://i.pcbeta.com/", wCookie, wOutBuffer, 1024 * 1024, FALSE);
+                            HttpRequest(L"bbs.pcbeta.com", wOut, L"https://i.pcbeta.com/", wCookie, wOutBuffer, 1024 * 1024-2, FALSE);
                             WCHAR* wPost = lstrstr(wOutBuffer, L"fastpostform");
                             if (wPost)
                             {
@@ -1576,7 +1576,7 @@ int SignPCBeta(WCHAR* wCookie)
                                                     WCHAR szPrint[1024];
                                                     wsprintf(szPrint, L"%d&formhash=%s&subject=&usesig=1", pt, wFormhash);
                                                     lstrcat(szPost, szPrint);
-                                                    HttpRequest(L"bbs.pcbeta.com", szLink, wReferer, wCookie, wOutBuffer, 1024 * 1024, TRUE, szPost);
+                                                    HttpRequest(L"bbs.pcbeta.com", szLink, wReferer, wCookie, wOutBuffer, 1024 * 1024-2, TRUE, szPost);
                                                 }
                                             }
                                         }
@@ -1588,7 +1588,7 @@ int SignPCBeta(WCHAR* wCookie)
                 }
                 WCHAR wReceive[1024] = L"/home.php?mod=task&do=draw&id=";
                 lstrcat(wReceive, wID);
-                HttpRequest(L"i.pcbeta.com", wReceive, L"https://i.pcbeta.com/", wCookie, wOutBuffer, 1024 * 1024, FALSE);
+                HttpRequest(L"i.pcbeta.com", wReceive, L"https://i.pcbeta.com/", wCookie, wOutBuffer, 1024 * 1024-2, FALSE);
             }
         }
     }
@@ -1599,7 +1599,7 @@ int SignPCBeta(WCHAR* wCookie)
 int SignMyDigit(WCHAR* wCookie)
 {
     WCHAR* wOutBuffer = new WCHAR[1024 * 1024];
-    HttpRequest(L"www.mydigit.cn", L"/plugin.php?id=k_misign:sign", L"https://www.mydigit.cn/", wCookie, wOutBuffer, 1024 * 1024, FALSE);
+    HttpRequest(L"www.mydigit.cn", L"/plugin.php?id=k_misign:sign", L"https://www.mydigit.cn/", wCookie, wOutBuffer, 1024 * 1024-2, FALSE);
     if (lstrstr(wOutBuffer, L"找回密码"))
     {
         WriteLog(L"Cookie失效    数码之家", TRUE);
@@ -1620,7 +1620,7 @@ int SignMyDigit(WCHAR* wCookie)
                 if (wLinkRight)
                 {
                     wLinkRight[0] = L'\0';
-                    HttpRequest(L"www.mydigit.cn", wLinkLeft, L"https://www.mydigit.cn/", wCookie, wOutBuffer, 1024 * 1024, FALSE);
+                    HttpRequest(L"www.mydigit.cn", wLinkLeft, L"https://www.mydigit.cn/", wCookie, wOutBuffer, 1024 * 1024-2, FALSE);
                 }
             }
         }
@@ -1632,7 +1632,7 @@ int SignMyDigit(WCHAR* wCookie)
 int SignTieba(WCHAR* wCookie)
 {
     WCHAR* wOutBuffer = new WCHAR[1024 * 1024];
-    HttpRequest(L"tieba.baidu.com", L"/f/like/mylike", L"https://tieba.baidu.com/", wCookie, wOutBuffer, 1024 * 1024, FALSE);
+    HttpRequest(L"tieba.baidu.com", L"/f/like/mylike", L"https://tieba.baidu.com/", wCookie, wOutBuffer, 1024 * 1024-2, FALSE);
     WCHAR* wStart = lstrstr(wOutBuffer, L"/f?kw");
     if (wStart)
     {
@@ -1646,7 +1646,7 @@ int SignTieba(WCHAR* wCookie)
                 wLinkEnd[0] = L'\0';
                 WCHAR wRequest[1024];
                 wsprintf(wRequest, L"/sign/add?ie=utf-8&kw=%s", wLinkStart);
-                HttpRequest(L"tieba.baidu.com", wRequest, L"https://tieba.baidu.com/", wCookie, wOutBuffer, 1024 * 1024, TRUE);
+                HttpRequest(L"tieba.baidu.com", wRequest, L"https://tieba.baidu.com/", wCookie, wOutBuffer, 1024 * 1024-2, TRUE);
                 Sleep(188);
             }
             wStart = wLinkEnd + 1;
@@ -1662,7 +1662,7 @@ int SignTieba(WCHAR* wCookie)
 int SignV2EX(WCHAR* wCookie)
 {
     WCHAR* wOutBuffer = new WCHAR[1024 * 1024];
-    HttpRequest(L"v2ex.com", L"/mission/daily", L"https://v2ex.com/", wCookie, wOutBuffer, 1024 * 1024, FALSE);
+    HttpRequest(L"v2ex.com", L"/mission/daily", L"https://v2ex.com/", wCookie, wOutBuffer, 1024 * 1024-2, FALSE);
     if (lstrstr(wOutBuffer, L"要先登录"))
     {
         WriteLog(L"Cookie失效    V2EX", TRUE);
@@ -1676,7 +1676,7 @@ int SignV2EX(WCHAR* wCookie)
         if (cLinkRight)
         {
             cLinkRight[0] = L'\0';
-            HttpRequest(L"v2ex.com", cLink, L"https://v2ex.com/mission/daily", wCookie, wOutBuffer, 1024 * 1024, FALSE);
+            HttpRequest(L"v2ex.com", cLink, L"https://v2ex.com/mission/daily", wCookie, wOutBuffer, 1024 * 1024-2, FALSE);
             return TRUE;
         }
     }
@@ -1707,7 +1707,7 @@ int SignSMZDM(WCHAR* wCookie)
 #endif
     wsprintf(szGet, L"/user/checkin/jsonp_checkin?callback=jQuery13689&_=%d168", pt);
     WCHAR wOutBuffer[4096];
-    HttpRequest(L"zhiyou.smzdm.com", szGet, L"https://www.smzdm.com/", wCookie, wOutBuffer, 4096, FALSE);
+    HttpRequest(L"zhiyou.smzdm.com", szGet, L"https://www.smzdm.com/", wCookie, wOutBuffer, 4096-2, FALSE);
     WCHAR* wErrorCode = lstrstr(wOutBuffer, L"error_code");
     int iErrorCode = -111;
     if (wErrorCode)
@@ -1821,9 +1821,9 @@ BOOL SearchSMZDM(REMINDITEM* lpRI, BOOL bList, int iPage, BOOL bSmzdmSearch, BOO
     WCHAR* szOutBuffer = new WCHAR[NETPAGESIZE];
     WCHAR wCookie[CookieSize] = L"ssmx_ab=mxss38";
     if (lpRI->szMemberID[0] == L'\0')
-        HttpRequest(L"search.smzdm.com", szGet, NULL, wCookie, szOutBuffer, NETPAGESIZE, FALSE);
+        HttpRequest(L"search.smzdm.com", szGet, NULL, wCookie, szOutBuffer, NETPAGESIZE-2, FALSE);
     else
-        HttpRequest(L"zhiyou.smzdm.com", szGet, NULL, wCookie, szOutBuffer, NETPAGESIZE, FALSE);
+        HttpRequest(L"zhiyou.smzdm.com", szGet, NULL, wCookie, szOutBuffer, NETPAGESIZE-2, FALSE);
     // Keep checking for data until there is nothing left.
     size_t i = 0;
     DWORD sl = lstrlen(szOutBuffer);
